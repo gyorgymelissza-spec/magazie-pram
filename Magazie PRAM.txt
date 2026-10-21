@@ -19,8 +19,7 @@
     .container { padding: 20px; max-width: 800px; margin: auto; }
     input[type="text"], input[type="number"], select { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-size: 1rem; }
     .card { background: white; padding: 15px; margin-bottom: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
-    .card h3 { margin: 0 0 5px 0; color: #333; display: flex; align-items: center; gap: 10px; }
-    .badge { background: #e2e8f0; color: #475569; padding: 4px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: normal; }
+    .card h3 { margin: 0 0 5px 0; color: #333; }
     .btn-add { background-color: #28a745; color: white; }
     .btn-remove { background-color: #dc3545; color: white; }
     .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 1000; }
@@ -29,7 +28,6 @@
     table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9rem; }
     th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
     th { background-color: #f2f2f2; }
-    .filter-group { display: flex; gap: 10px; margin-bottom: 20px; }
   </style>
 </head>
 <body>
@@ -40,20 +38,7 @@
   </header>
 
   <div class="container">
-    
-    <!-- Zona de căutare și filtrare pe categorii -->
-    <div class="filter-group">
-      <input type="text" id="searchInput" placeholder="Caută material..." onkeyup="filterItems()" style="flex: 2; margin: 0;">
-      <select id="categoryFilter" onchange="filterItems()" style="flex: 1; margin: 0;">
-        <option value="toate">Toate categoriile</option>
-        <option value="Relee">Relee</option>
-        <option value="Cleme">Cleme</option>
-        <option value="Siguranțe">Siguranțe</option>
-        <option value="Cabluri">Cabluri</option>
-        <option value="Scule">Scule</option>
-        <option value="Altele">Altele</option>
-      </select>
-    </div>
+    <input type="text" id="searchInput" placeholder="Caută material (ex: cleme, siguranțe)..." onkeyup="filterItems()">
     
     <!-- Butonul minimalist cu "+" -->
     <button id="showFormBtn" onclick="toggleNewItemForm()" style="background: white; border: 2px dashed #0056b3; color: #0056b3; width: 100%; padding: 20px; border-radius: 8px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 5px; margin-bottom: 20px;">
@@ -65,24 +50,15 @@
     <div id="newItemFormContainer" style="display: none; background: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ddd;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
         <h3 style="margin: 0;">Adaugă material nou</h3>
-        <button onclick="toggleNewItemForm()" style="background: none; border: none; color: #dc3545; font-size: 1rem; padding: 0;">✖ Închide</button>
+        <button onclick="toggleNewItemForm()" style="background: none; border: none; color: #dc3545; font-size: 1rem; padding: 0; cursor: pointer;">✖ Închide</button>
       </div>
       <input type="text" id="newItemName" placeholder="Nume material">
-      <select id="newItemCategory">
-        <option value="">-- Alege categoria --</option>
-        <option value="Relee">Relee</option>
-        <option value="Cleme">Cleme</option>
-        <option value="Siguranțe">Siguranțe</option>
-        <option value="Cabluri">Cabluri</option>
-        <option value="Scule">Scule</option>
-        <option value="Altele">Altele</option>
-      </select>
       <input type="number" id="newItemQty" placeholder="Cantitate inițială">
       <button class="btn-add" onclick="addNewItem()" style="width: 100%;">Creează în baza de date</button>
     </div>
 
     <div id="inventoryList">
-      <!-- Aici se vor încărca materialele automat din baza de date -->
+      <!-- Aici se vor încărca materialele automat -->
     </div>
   </div>
 
@@ -166,12 +142,10 @@
       list.innerHTML = '';
       snapshot.forEach((doc) => {
         const item = doc.data();
-        const categorie = item.categorie || "Altele";
-        
         list.innerHTML += `
-          <div class="card item-card" data-category="${categorie.toLowerCase()}">
+          <div class="card item-card">
             <div>
-              <h3 class="item-name">${item.nume} <span class="badge">${categorie}</span></h3>
+              <h3 class="item-name">${item.nume}</h3>
               <p style="margin:0; color:#555;">Stoc: <strong>${item.cantitate}</strong> buc.</p>
             </div>
             <div>
@@ -180,7 +154,6 @@
           </div>
         `;
       });
-      filterItems();
     });
 
     const q = query(collection(db, "istoric"), orderBy("data", "desc"));
@@ -219,17 +192,14 @@
 
     window.addNewItem = async function() {
       const nume = document.getElementById("newItemName").value;
-      const categorie = document.getElementById("newItemCategory").value;
       const cantitate = parseInt(document.getElementById("newItemQty").value);
-      
-      if (nume && categorie && cantitate >= 0) {
-        await addDoc(collection(db, "stocuri"), { nume: nume, cantitate: cantitate, categorie: categorie });
+      if (nume && cantitate >= 0) {
+        await addDoc(collection(db, "stocuri"), { nume: nume, cantitate: cantitate });
         document.getElementById("newItemName").value = '';
-        document.getElementById("newItemCategory").value = '';
         document.getElementById("newItemQty").value = '';
         toggleNewItemForm(); // Ascunde formularul înapoi după ce ai creat materialul
       } else {
-        alert("Te rog introdu un nume, alege o categorie și pune o cantitate validă.");
+        alert("Te rog introdu un nume și o cantitate validă.");
       }
     };
 
@@ -272,18 +242,11 @@
     };
 
     window.filterItems = function() {
-      const searchInput = document.getElementById("searchInput").value.toLowerCase();
-      const categoryFilter = document.getElementById("categoryFilter").value.toLowerCase();
+      const input = document.getElementById("searchInput").value.toLowerCase();
       const cards = document.getElementsByClassName("item-card");
-      
       for (let i = 0; i < cards.length; i++) {
         const name = cards[i].getElementsByClassName("item-name")[0].innerText.toLowerCase();
-        const itemCategory = cards[i].getAttribute("data-category");
-        
-        const matchesSearch = name.includes(searchInput);
-        const matchesCategory = (categoryFilter === "toate" || itemCategory === categoryFilter);
-        
-        cards[i].style.display = (matchesSearch && matchesCategory) ? "flex" : "none";
+        cards[i].style.display = name.includes(input) ? "flex" : "none";
       }
     };
 
