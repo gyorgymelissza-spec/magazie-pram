@@ -42,15 +42,25 @@
   <div class="container">
     <input type="text" id="searchInput" placeholder="Caută material (ex: cleme, siguranțe)..." onkeyup="filterItems()">
     
-    <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ddd;">
-      <h3 style="margin-top: 0;">Adaugă material nou</h3>
+    <!-- Butonul minimalist cu "+" -->
+    <button id="showFormBtn" onclick="toggleNewItemForm()" style="background: white; border: 2px dashed #0056b3; color: #0056b3; width: 100%; padding: 20px; border-radius: 8px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 5px; margin-bottom: 20px;">
+      <span style="font-size: 2.5rem; line-height: 1; font-weight: bold;">+</span>
+      <span style="font-size: 1rem; font-weight: bold;">Adaugă materiale noi în magazie</span>
+    </button>
+
+    <!-- Zona de adăugare material nou (Ascunsă inițial) -->
+    <div id="newItemFormContainer" style="display: none; background: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ddd;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <h3 style="margin: 0;">Adaugă material nou</h3>
+        <button onclick="toggleNewItemForm()" style="background: none; border: none; color: #dc3545; font-size: 1rem; padding: 0; cursor: pointer;">✖ Închide</button>
+      </div>
       <input type="text" id="newItemName" placeholder="Nume material">
       <input type="number" id="newItemQty" placeholder="Cantitate inițială">
       <button class="btn-add" onclick="addNewItem()" style="width: 100%;">Creează în baza de date</button>
     </div>
 
     <div id="inventoryList">
-      <!-- Aici se vor încărca materialele automat din baza de date -->
+      <!-- Aici se vor încărca materialele automat -->
     </div>
   </div>
 
@@ -64,9 +74,20 @@
       <!-- ========================================== -->
       <select id="electricianName">
         <option value="">-- Cine modifică stocul? --</option>
-        <option value="Coleg 1">Coleg 1</option>
-        <option value="Coleg 2">Coleg 2</option>
-        <option value="Coleg 3">Coleg 3</option>
+        <option value="Bonat Radu">Bonat Radu</option>
+        <option value="Cristian Andrei">Cristian Andrei</option>
+        <option value="Dicsiuk János">Dicsiuk János</option>
+        <option value="Fedorca Horea">Fedorca Horea</option>
+        <option value="Fertea Cristian">Fertea Cristian</option>
+        <option value="György Melissza">György Melissza</option>
+        <option value="Ilyés Oscar">Ilyés Oscar</option>
+        <option value="Lakatos László">Lakatos László</option>
+        <option value="Pop Mircea">Pop Mircea</option>
+        <option value="Sabou Tudor">Sabou Tudor</option>
+        <option value="Surduc Lucian">Surduc Lucian</option>
+        <option value="Traxler Arthur">Traxler Arthur</option>
+        <option value="Trif Gabriel">Trif Gabriel</option>
+        <option value="Vlad Alexandru">Vlad Alexandru</option>
       </select>
       
       <input type="number" id="transactionQty" placeholder="Introdu cantitatea">
@@ -82,7 +103,7 @@
   <!-- Fereastra pentru Istoric -->
   <div id="historyModal" class="modal">
     <div class="modal-content" style="max-width: 600px; max-height: 80vh; overflow-y: auto;">
-      <h3 style="margin-top:0;">Istoric Mișcări</h3>
+      <h3 style="margin-top:0;">Istoric magazie</h3>
       <table>
         <thead>
           <tr>
@@ -108,14 +129,14 @@
     // ==========================================
     // 2. MODIFICĂ AICI: DATELE TALE FIREBASE
     // ==========================================
-  const firebaseConfig = {
-  apiKey: "AIzaSyCpQBd3uUKxJ13WRVWU8mU7lknG2cN8b7k",
-  authDomain: "magazie-pram.firebaseapp.com",
-  projectId: "magazie-pram",
-  storageBucket: "magazie-pram.firebasestorage.app",
-  messagingSenderId: "1050395080468",
-  appId: "1:1050395080468:web:ed32c736f61e7a1e7f7401"
-};
+    const firebaseConfig = {
+      apiKey: "AIzaSyCpQBd3uUKxJ13WRVWU8mU7lknG2cN8b7k",
+      authDomain: "magazie-pram.firebaseapp.com",
+      projectId: "magazie-pram",
+      storageBucket: "magazie-pram.firebasestorage.app",
+      messagingSenderId: "1050395080468",
+      appId: "1:1050395080468:web:ed32c736f61e7a1e7f7401"
+    };
 
     // Inițializare aplicație Firebase
     const app = initializeApp(firebaseConfig);
@@ -167,6 +188,19 @@
       });
     });
 
+    // Funcție pentru a afișa/ascunde formularul
+    window.toggleNewItemForm = function() {
+      const form = document.getElementById("newItemFormContainer");
+      const btn = document.getElementById("showFormBtn");
+      if (form.style.display === "none" || form.style.display === "") {
+        form.style.display = "block";
+        btn.style.display = "none";
+      } else {
+        form.style.display = "none";
+        btn.style.display = "flex";
+      }
+    };
+
     // Creare material nou
     window.addNewItem = async function() {
       const nume = document.getElementById("newItemName").value;
@@ -175,6 +209,7 @@
         await addDoc(collection(db, "stocuri"), { nume: nume, cantitate: cantitate });
         document.getElementById("newItemName").value = '';
         document.getElementById("newItemQty").value = '';
+        toggleNewItemForm(); // Ascunde formularul după salvare
       } else {
         alert("Te rog introdu un nume și o cantitate validă.");
       }
