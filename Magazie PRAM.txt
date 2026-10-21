@@ -196,7 +196,7 @@
         await addDoc(collection(db, "stocuri"), { nume: nume, cantitate: cantitate });
         document.getElementById("newItemName").value = '';
         document.getElementById("newItemQty").value = '';
-        toggleNewItemForm(); // Ascunde formularul înapoi după ce ai creat materialul
+        toggleNewItemForm(); 
       } else {
         alert("Te rog introdu un nume și o cantitate validă.");
       }
