@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Magazie PRAM</title>
+  
+  <!-- Configurare aplicație telefon (PWA) -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0056b3">
+  <link rel="apple-touch-icon" href="icon-192.png">
+
+  <style>
+    /* Design și aspect */
+    body { font-family: Arial, sans-serif; background-color: #f4f4f9; margin: 0; padding: 0; }
+    header { background-color: #0056b3; color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
+    h1 { margin: 0; font-size: 1.5rem; }
+    button { cursor: pointer; padding: 10px 15px; border: none; border-radius: 5px; font-weight: bold; font-size: 1rem; }
+    .btn-history { background-color: #ffc107; color: #333; }
+    .container { padding: 20px; max-width: 800px; margin: auto; }
+    input[type="text"], input[type="number"], select { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-size: 1rem; }
+    .card { background: white; padding: 15px; margin-bottom: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
+    .card h3 { margin: 0 0 5px 0; color: #333; }
+    .btn-add { background-color: #28a745; color: white; }
+    .btn-remove { background-color: #dc3545; color: white; }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 1000; }
+    .modal-content { background: white; padding: 20px; border-radius: 8px; width: 90%; max-width: 400px; }
+    .close-btn { background: #6c757d; color: white; width: 100%; margin-top: 15px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9rem; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    th { background-color: #f2f2f2; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Magazie PRAM</h1>
+    <button class="btn-history" onclick="openHistory()">Istoric</button>
+  </header>
+
+  <div class="container">
+    <input type="text" id="searchInput" placeholder="Caută material (ex: cleme, siguranțe)..." onkeyup="filterItems()">
+    
+    <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ddd;">
+      <h3 style="margin-top: 0;">Adaugă material nou</h3>
+      <input type="text" id="newItemName" placeholder="Nume material">
+      <input type="number" id="newItemQty" placeholder="Cantitate inițială">
+      <button class="btn-add" onclick="addNewItem()" style="width: 100%;">Creează în baza de date</button>
+    </div>
+
+    <div id="inventoryList">
+      <!-- Aici se vor încărca materialele automat din baza de date -->
+    </div>
+  </div>
+
+  <!-- Fereastra pentru Adăugare/Extragere (Tranzacție) -->
+  <div id="transactionModal" class="modal">
+    <div class="modal-content">
+      <h3 id="modalItemName" style="margin-top:0; color:#0056b3;">Nume Material</h3>
+      
+      <!-- ========================================== -->
+      <!-- 1. MODIFICĂ AICI: LISTA ELECTRICIENILOR -->
+      <!-- ========================================== -->
+      <select id="electricianName">
+        <option value="">-- Cine modifică stocul? --</option>
+        <option value="Coleg 1">Coleg 1</option>
+        <option value="Coleg 2">Coleg 2</option>
+        <option value="Coleg 3">Coleg 3</option>
+      </select>
+      
+      <input type="number" id="transactionQty" placeholder="Introdu cantitatea">
+      
+      <div style="display: flex; gap: 10px; margin-top: 15px;">
+        <button class="btn-add" style="flex: 1;" onclick="submitTransaction('add')">+ Adaugă</button>
+        <button class="btn-remove" style="flex: 1;" onclick="submitTransaction('remove')">- Extrage</button>
+      </div>
+      <button class="close-btn" onclick="closeModal('transactionModal')">Anulează</button>
+    </div>
+  </div>
+
+  <!-- Fereastra pentru Istoric -->
+  <div id="historyModal" class="modal">
+    <div class="modal-content" style="max-width: 600px; max-height: 80vh; overflow-y: auto;">
+      <h3 style="margin-top:0;">Istoric Mișcări</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Nume</th>
+            <th>Material</th>
+            <th>Buc.</th>
+          </tr>
+        </thead>
+        <tbody id="historyTableBody">
+          <!-- Istoricul se va încărca aici -->
+        </tbody>
+      </table>
+      <button class="close-btn" onclick="closeModal('historyModal')">Închide</button>
+    </div>
+  </div>
+
+  <!-- Logica și conexiunea cu Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js";
+    import { getFirestore, collection, onSnapshot, doc, updateDoc, addDoc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
+
+    // ==========================================
+    // 2. MODIFICĂ AICI: DATELE TALE FIREBASE
+    // ==========================================
+  const firebaseConfig = {
+  apiKey: "AIzaSyCpQBd3uUKxJ13WRVWU8mU7lknG2cN8b7k",
+  authDomain: "magazie-pram.firebaseapp.com",
+  projectId: "magazie-pram",
+  storageBucket: "magazie-pram.firebasestorage.app",
+  messagingSenderId: "1050395080468",
+  appId: "1:1050395080468:web:ed32c736f61e7a1e7f7401"
+};
+
+    // Inițializare aplicație Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    
+    let currentItemId = '';
+    let currentItemStock = 0;
+    let currentItemNameText = '';
+
+    // Afișează stocurile în timp real
+    onSnapshot(collection(db, "stocuri"), (snapshot) => {
+      const list = document.getElementById("inventoryList");
+      list.innerHTML = '';
+      snapshot.forEach((doc) => {
+        const item = doc.data();
+        list.innerHTML += `
+          <div class="card item-card">
+            <div>
+              <h3 class="item-name">${item.nume}</h3>
+              <p style="margin:0; color:#555;">Stoc: <strong>${item.cantitate}</strong> buc.</p>
+            </div>
+            <div>
+              <button class="btn-history" onclick="openTransactionModal('${doc.id}', '${item.nume}', ${item.cantitate})">Modifică</button>
+            </div>
+          </div>
+        `;
+      });
+    });
+
+    // Afișează istoricul în timp real
+    const q = query(collection(db, "istoric"), orderBy("data", "desc"));
+    onSnapshot(q, (snapshot) => {
+      const tbody = document.getElementById("historyTableBody");
+      tbody.innerHTML = '';
+      snapshot.forEach((doc) => {
+        const tx = doc.data();
+        const dateStr = tx.data ? tx.data.toDate().toLocaleString('ro-RO', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'}) : 'Acum';
+        const color = tx.tip === 'add' ? '#28a745' : '#dc3545';
+        const sign = tx.tip === 'add' ? '+' : '-';
+        
+        tbody.innerHTML += `
+          <tr>
+            <td>${dateStr}</td>
+            <td>${tx.electrician}</td>
+            <td>${tx.material}</td>
+            <td style="color: ${color}; font-weight: bold;">${sign}${tx.cantitate}</td>
+          </tr>
+        `;
+      });
+    });
+
+    // Creare material nou
+    window.addNewItem = async function() {
+      const nume = document.getElementById("newItemName").value;
+      const cantitate = parseInt(document.getElementById("newItemQty").value);
+      if (nume && cantitate >= 0) {
+        await addDoc(collection(db, "stocuri"), { nume: nume, cantitate: cantitate });
+        document.getElementById("newItemName").value = '';
+        document.getElementById("newItemQty").value = '';
+      } else {
+        alert("Te rog introdu un nume și o cantitate validă.");
+      }
+    };
+
+    // Deschidere fereastră tranzacție
+    window.openTransactionModal = function(id, name, stock) {
+      currentItemId = id;
+      currentItemNameText = name;
+      currentItemStock = stock;
+      document.getElementById("modalItemName").innerText = name;
+      document.getElementById("transactionQty").value = '';
+      document.getElementById("electricianName").value = '';
+      document.getElementById("transactionModal").style.display = "flex";
+    };
+
+    // Confirmare Adăugare sau Extragere
+    window.submitTransaction = async function(tip) {
+      const qty = parseInt(document.getElementById("transactionQty").value);
+      const electrician = document.getElementById("electricianName").value;
+
+      if (!electrician) { alert("Selectează electricianul!"); return; }
+      if (!qty || qty <= 0) { alert("Introdu o cantitate mai mare ca zero!"); return; }
+
+      let newStock = currentItemStock;
+      if (tip === 'add') {
+        newStock += qty;
+      } else if (tip === 'remove') {
+        if (qty > currentItemStock) { alert("Atenție! Nu poți extrage mai mult decât ai pe stoc."); return; }
+        newStock -= qty;
+      }
+
+      // Actualizăm stocul în Firebase
+      await updateDoc(doc(db, "stocuri", currentItemId), { cantitate: newStock });
+
+      // Salvăm mișcarea în istoric
+      await addDoc(collection(db, "istoric"), {
+        material: currentItemNameText,
+        electrician: electrician,
+        cantitate: qty,
+        tip: tip,
+        data: serverTimestamp()
+      });
+
+      closeModal('transactionModal');
+    };
+
+    // Funcția pentru motorul de căutare
+    window.filterItems = function() {
+      const input = document.getElementById("searchInput").value.toLowerCase();
+      const cards = document.getElementsByClassName("item-card");
+      for (let i = 0; i < cards.length; i++) {
+        const name = cards[i].getElementsByClassName("item-name")[0].innerText.toLowerCase();
+        cards[i].style.display = name.includes(input) ? "flex" : "none";
+      }
+    };
+
+    // Închidere/Deschidere ferestre (Modals)
+    window.openHistory = function() { document.getElementById("historyModal").style.display = "flex"; };
+    window.closeModal = function(id) { document.getElementById(id).style.display = "none"; };
+  </script>
+
+  <!-- Script necesar pentru iconița de pe telefon -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js');
+    }
+  </script>
+</body>
+</html>
