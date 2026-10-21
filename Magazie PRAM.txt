@@ -55,9 +55,18 @@
       </select>
     </div>
     
-    <!-- Zona de adăugare material nou -->
-    <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ddd;">
-      <h3 style="margin-top: 0;">Adaugă material nou</h3>
+    <!-- Butonul minimalist cu "+" -->
+    <button id="showFormBtn" onclick="toggleNewItemForm()" style="background: white; border: 2px dashed #0056b3; color: #0056b3; width: 100%; padding: 20px; border-radius: 8px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 5px; margin-bottom: 20px;">
+      <span style="font-size: 2.5rem; line-height: 1; font-weight: bold;">+</span>
+      <span style="font-size: 1rem; font-weight: bold;">Adaugă materiale noi în magazie</span>
+    </button>
+
+    <!-- Zona de adăugare material nou (Ascunsă inițial) -->
+    <div id="newItemFormContainer" style="display: none; background: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ddd;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <h3 style="margin: 0;">Adaugă material nou</h3>
+        <button onclick="toggleNewItemForm()" style="background: none; border: none; color: #dc3545; font-size: 1rem; padding: 0;">✖ Închide</button>
+      </div>
       <input type="text" id="newItemName" placeholder="Nume material">
       <select id="newItemCategory">
         <option value="">-- Alege categoria --</option>
@@ -195,6 +204,19 @@
       });
     });
 
+    // Funcție pentru a afișa/ascunde formularul de material nou
+    window.toggleNewItemForm = function() {
+      const form = document.getElementById("newItemFormContainer");
+      const btn = document.getElementById("showFormBtn");
+      if (form.style.display === "none") {
+        form.style.display = "block";
+        btn.style.display = "none";
+      } else {
+        form.style.display = "none";
+        btn.style.display = "flex";
+      }
+    };
+
     window.addNewItem = async function() {
       const nume = document.getElementById("newItemName").value;
       const categorie = document.getElementById("newItemCategory").value;
@@ -205,6 +227,7 @@
         document.getElementById("newItemName").value = '';
         document.getElementById("newItemCategory").value = '';
         document.getElementById("newItemQty").value = '';
+        toggleNewItemForm(); // Ascunde formularul înapoi după ce ai creat materialul
       } else {
         alert("Te rog introdu un nume, alege o categorie și pune o cantitate validă.");
       }
