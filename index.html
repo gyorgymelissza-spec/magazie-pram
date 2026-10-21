@@ -241,7 +241,7 @@
         if (qty > currentItemStock) { alert("Atenție! Nu poți extrage mai mult decât ai pe stoc."); return; }
         newStock -= qty;
       }
-
+ closeModal('transactionModal');
       // Actualizăm stocul în Firebase
       await updateDoc(doc(db, "stocuri", currentItemId), { cantitate: newStock });
 
@@ -254,7 +254,7 @@
         data: serverTimestamp()
       });
 
-      closeModal('transactionModal');
+     
     };
 
     // Funcția pentru motorul de căutare
