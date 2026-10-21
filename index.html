@@ -69,9 +69,6 @@
     <div class="modal-content">
       <h3 id="modalItemName" style="margin-top:0; color:#0056b3;">Nume Material</h3>
       
-      <!-- ========================================== -->
-      <!-- 1. MODIFICĂ AICI: LISTA ELECTRICIENILOR -->
-      <!-- ========================================== -->
       <select id="electricianName">
         <option value="">-- Cine modifică stocul? --</option>
         <option value="Bonaț Radu">Bonaț Radu</option>
@@ -126,9 +123,6 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js";
     import { getFirestore, collection, onSnapshot, doc, updateDoc, addDoc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
 
-    // ==========================================
-    // 2. MODIFICĂ AICI: DATELE TALE FIREBASE
-    // ==========================================
     const firebaseConfig = {
       apiKey: "AIzaSyCpQBd3uUKxJ13WRVWU8mU7lknG2cN8b7k",
       authDomain: "magazie-pram.firebaseapp.com",
@@ -138,7 +132,6 @@
       appId: "1:1050395080468:web:ed32c736f61e7a1e7f7401"
     };
 
-    // Inițializare aplicație Firebase
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     
@@ -146,7 +139,6 @@
     let currentItemStock = 0;
     let currentItemNameText = '';
 
-    // Afișează stocurile în timp real
     onSnapshot(collection(db, "stocuri"), (snapshot) => {
       const list = document.getElementById("inventoryList");
       list.innerHTML = '';
@@ -166,7 +158,6 @@
       });
     });
 
-    // Afișează istoricul în timp real
     const q = query(collection(db, "istoric"), orderBy("data", "desc"));
     onSnapshot(q, (snapshot) => {
       const tbody = document.getElementById("historyTableBody");
@@ -188,7 +179,6 @@
       });
     });
 
-    // Funcție pentru a afișa/ascunde formularul
     window.toggleNewItemForm = function() {
       const form = document.getElementById("newItemFormContainer");
       const btn = document.getElementById("showFormBtn");
@@ -201,7 +191,6 @@
       }
     };
 
-    // Creare material nou
     window.addNewItem = async function() {
       const nume = document.getElementById("newItemName").value;
       const cantitate = parseInt(document.getElementById("newItemQty").value);
@@ -209,13 +198,12 @@
         await addDoc(collection(db, "stocuri"), { nume: nume, cantitate: cantitate });
         document.getElementById("newItemName").value = '';
         document.getElementById("newItemQty").value = '';
-        toggleNewItemForm(); // Ascunde formularul după salvare
+        toggleNewItemForm(); 
       } else {
         alert("Te rog introdu un nume și o cantitate validă.");
       }
     };
 
-    // Deschidere fereastră tranzacție
     window.openTransactionModal = function(id, name, stock) {
       currentItemId = id;
       currentItemNameText = name;
@@ -226,7 +214,6 @@
       document.getElementById("transactionModal").style.display = "flex";
     };
 
-    // Confirmare Adăugare sau Extragere
     window.submitTransaction = async function(tip) {
       const qty = parseInt(document.getElementById("transactionQty").value);
       const electrician = document.getElementById("electricianName").value;
@@ -241,11 +228,11 @@
         if (qty > currentItemStock) { alert("Atenție! Nu poți extrage mai mult decât ai pe stoc."); return; }
         newStock -= qty;
       }
- closeModal('transactionModal');
-      // Actualizăm stocul în Firebase
+
+      closeModal('transactionModal');
+
       await updateDoc(doc(db, "stocuri", currentItemId), { cantitate: newStock });
 
-      // Salvăm mișcarea în istoric
       await addDoc(collection(db, "istoric"), {
         material: currentItemNameText,
         electrician: electrician,
@@ -253,11 +240,8 @@
         tip: tip,
         data: serverTimestamp()
       });
-
-     
     };
 
-    // Funcția pentru motorul de căutare
     window.filterItems = function() {
       const input = document.getElementById("searchInput").value.toLowerCase();
       const cards = document.getElementsByClassName("item-card");
@@ -267,7 +251,6 @@
       }
     };
 
-    // Închidere/Deschidere ferestre (Modals)
     window.openHistory = function() { document.getElementById("historyModal").style.display = "flex"; };
     window.closeModal = function(id) { document.getElementById(id).style.display = "none"; };
   </script>
