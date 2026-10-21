@@ -177,11 +177,10 @@
       });
     });
 
-    // Funcție pentru a afișa/ascunde formularul de material nou
     window.toggleNewItemForm = function() {
       const form = document.getElementById("newItemFormContainer");
       const btn = document.getElementById("showFormBtn");
-      if (form.style.display === "none") {
+      if (form.style.display === "none" || form.style.display === "") {
         form.style.display = "block";
         btn.style.display = "none";
       } else {
