@@ -57,24 +57,24 @@
 
       <div class="auth-box">
         <label style="font-size: 0.9rem; font-weight: bold; color: #333;">Verificare electrician:</label>
-        <select id="newElectricianName">
+        <select id="newElectricianName" onchange="onNameChange('new')">
           <option value="">-- Cine adaugă materialul? --</option>
-          <option value="Bonati Cătălin Radu">Bonati Cătălin Radu</option>
+          <option value="Bonați Cătălin Radu">Bonați Cătălin Radu</option>
           <option value="Cristian Cosmin Andrei">Cristian Cosmin Andrei</option>
-          <option value="Dicsiuk Janos Ferencz">Dicsiuk Janos Ferencz[cite: 26]</option>
-          <option value="Fedorca Horea Cristian">Fedorca Horea Cristian[cite: 26]</option>
+          <option value="Dicsiuk János Ferencz">Dicsiuk János Ferencz</option>
+          <option value="Fedorca Horea Cristian">Fedorca Horea Cristian</option>
           <option value="Fertea Cristian">Fertea Cristian</option>
-          <option value="Gyorgy Melissza">Gyorgy Melissza</option>
-          <option value="Ilyes Oscar">Ilyes Oscar</option>
-          <option value="Lakatos Laszlo">Lakatos Laszlo</option>
+          <option value="György Melissza">György Melissza</option>
+          <option value="Ilyés Oscar">Ilyés Oscar</option>
+          <option value="Lakatos László">Lakatos László</option>
           <option value="Pop Mircea">Pop Mircea</option>
           <option value="Sabou Tudor">Sabou Tudor</option>
-          <option value="Surduc Lucian Viorel">Surduc Lucian Viorel[cite: 26]</option>
+          <option value="Surduc Lucian Viorel">Surduc Lucian Viorel</option>
           <option value="Traxler Arthur">Traxler Arthur</option>
-          <option value="Trif Gabriel Dan">Trif Gabriel Dan[cite: 26]</option>
-          <option value="Vlad Ioan Alexandru">Vlad Ioan Alexandru[cite: 26]</option>
+          <option value="Trif Gabriel Dan">Trif Gabriel Dan</option>
+          <option value="Vlad Ioan Alexandru">Vlad Ioan Alexandru</option>
         </select>
-        <input type="password" id="newElectricianPin" placeholder="Introdu ultimele 5 cifre din marcă" maxlength="5">
+        <input type="password" id="newElectricianPin" placeholder="Marcă (ultimele 5 cifre)" maxlength="5">
       </div>
 
       <input type="text" id="newItemName" placeholder="Nume material nou">
@@ -94,24 +94,24 @@
       
       <div class="auth-box">
         <label style="font-size: 0.9rem; font-weight: bold; color: #333;">Verificare electrician:</label>
-        <select id="electricianName">
+        <select id="electricianName" onchange="onNameChange('modal')">
           <option value="">-- Cine modifică stocul? --</option>
-          <option value="Bonati Cătălin Radu">Bonati Cătălin Radu</option>
+          <option value="Bonați Cătălin Radu">Bonați Cătălin Radu</option>
           <option value="Cristian Cosmin Andrei">Cristian Cosmin Andrei</option>
-          <option value="Dicsiuk Janos Ferencz">Dicsiuk Janos Ferencz[cite: 26]</option>
-          <option value="Fedorca Horea Cristian">Fedorca Horea Cristian[cite: 26]</option>
+          <option value="Dicsiuk János Ferencz">Dicsiuk János Ferencz</option>
+          <option value="Fedorca Horea Cristian">Fedorca Horea Cristian</option>
           <option value="Fertea Cristian">Fertea Cristian</option>
-          <option value="Gyorgy Melissza">Gyorgy Melissza</option>
-          <option value="Ilyes Oscar">Ilyes Oscar</option>
-          <option value="Lakatos Laszlo">Lakatos Laszlo</option>
+          <option value="György Melissza">György Melissza</option>
+          <option value="Ilyés Oscar">Ilyés Oscar</option>
+          <option value="Lakatos László">Lakatos László</option>
           <option value="Pop Mircea">Pop Mircea</option>
           <option value="Sabou Tudor">Sabou Tudor</option>
-          <option value="Surduc Lucian Viorel">Surduc Lucian Viorel[cite: 26]</option>
+          <option value="Surduc Lucian Viorel">Surduc Lucian Viorel</option>
           <option value="Traxler Arthur">Traxler Arthur</option>
-          <option value="Trif Gabriel Dan">Trif Gabriel Dan[cite: 26]</option>
-          <option value="Vlad Ioan Alexandru">Vlad Ioan Alexandru[cite: 26]</option>
+          <option value="Trif Gabriel Dan">Trif Gabriel Dan</option>
+          <option value="Vlad Ioan Alexandru">Vlad Ioan Alexandru</option>
         </select>
-        <input type="password" id="electricianPin" placeholder="Introdu ultimele 5 cifre din marcă" maxlength="5">
+        <input type="password" id="electricianPin" placeholder="Marcă (ultimele 5 cifre)" maxlength="5">
       </div>
       
       <input type="number" id="transactionQty" placeholder="Introdu cantitatea">
@@ -166,34 +166,56 @@
     let currentItemStock = 0;
     let currentItemNameText = '';
 
-    // Baza de date completă cu mărcile din listă[cite: 26]
     const marciValide = {
-      "Dicsiuk Janos Ferencz": "60008571",[cite: 26]
-      "Traxler Arthur": "60008142",[cite: 26]
-      "Surduc Lucian Viorel": "60009138",[cite: 26]
-      "Fedorca Horea Cristian": "60008750",[cite: 26]
-      "Trif Gabriel Dan": "60010562",[cite: 26]
-      "Vlad Ioan Alexandru": "60009107",[cite: 26]
-      "Lakatos Laszlo": "60009139",[cite: 26]
-      "Bonati Cătălin Radu": "60009644",[cite: 26]
-      "Pop Mircea": "60008745",[cite: 26]
-      "Cristian Cosmin Andrei": "60010378",[cite: 26]
-      "Gyorgy Melissza": "60010567",[cite: 26]
-      "Sabou Tudor": "60009137",[cite: 26]
-      "Ilyes Oscar": "60008572",[cite: 26]
-      "Fertea Cristian": "60008569"[cite: 26]
+      "Dicsiuk János Ferencz": "60008571",
+      "Traxler Arthur": "60008142",
+      "Surduc Lucian Viorel": "60009138",
+      "Fedorca Horea Cristian": "60008750",
+      "Trif Gabriel Dan": "60010562",
+      "Vlad Ioan Alexandru": "60009107",
+      "Lakatos László": "60009139",
+      "Bonați Cătălin Radu": "60009644",
+      "Pop Mircea": "60008745",
+      "Cristian Cosmin Andrei": "60010378",
+      "György Melissza": "60010567",
+      "Sabou Tudor": "60009137",
+      "Ilyés Oscar": "60008572",
+      "Fertea Cristian": "60008569"
     };
 
-    // Verifică dacă există un electrician deja logat în memoria telefonului
-    window.addEventListener('DOMContentLoaded', () => {
+    // Funcție care încarcă automat utilizatorul și marca dacă este deja logat pe telefon
+    function incarcaDateSalvate() {
       const savedName = localStorage.getItem('pram_user');
+      const savedPin = localStorage.getItem('pram_pin');
       if (savedName && marciValide[savedName]) {
-        ['electricianName', 'newElectricianName'].forEach(id => {
-          const el = document.getElementById(id);
-          if (el) el.value = savedName;
-        });
+        const elModal = document.getElementById('electricianName');
+        const elNew = document.getElementById('newElectricianName');
+        const pinModal = document.getElementById('electricianPin');
+        const pinNew = document.getElementById('newElectricianPin');
+
+        if (elModal) elModal.value = savedName;
+        if (elNew) elNew.value = savedName;
+        if (savedPin) {
+          if (pinModal) pinModal.value = savedPin;
+          if (pinNew) pinNew.value = savedPin;
+        }
       }
-    });
+    }
+
+    window.addEventListener('DOMContentLoaded', incarcaDateSalvate);
+
+    // Dacă cineva schimbă numele din meniu cu alt coleg, îi ștergem PIN-ul salvat și îi cerem marca nouă
+    window.onNameChange = function(tip) {
+      const savedName = localStorage.getItem('pram_user');
+      const savedPin = localStorage.getItem('pram_pin');
+      if (tip === 'modal') {
+        const currentName = document.getElementById('electricianName').value;
+        document.getElementById('electricianPin').value = (currentName === savedName && savedPin) ? savedPin : '';
+      } else {
+        const currentName = document.getElementById('newElectricianName').value;
+        document.getElementById('newElectricianPin').value = (currentName === savedName && savedPin) ? savedPin : '';
+      }
+    };
 
     function verificaElectrician(nume, pin) {
       if (!nume) {
@@ -213,8 +235,9 @@
         return false;
       }
       
-      // Memorează utilizatorul pe dispozitiv dacă datele sunt corecte
+      // Memorează atât numele cât și marca validată ca să rămână logat automat
       localStorage.setItem('pram_user', nume);
+      localStorage.setItem('pram_pin', pin.trim());
       return true;
     }
 
@@ -244,8 +267,8 @@
       snapshot.forEach((doc) => {
         const tx = doc.data();
         const dateStr = tx.data ? tx.data.toDate().toLocaleString('ro-RO', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'}) : 'Acum';
-        const color = tx.tip === 'add' ? '#28a745' : '#dc3545';
-        const sign = tx.tip === 'add' ? '+' : (tx.tip === 'create' ? 'NOU' : '-');
+        const color = (tx.tip === 'add' || tx.tip === 'create') ? '#28a745' : '#dc3545';
+        const sign = tx.tip === 'add' ? '+' : (tx.tip === 'create' ? 'NOU ' : '-');
         
         tbody.innerHTML += `
           <tr>
@@ -262,6 +285,7 @@
       const form = document.getElementById("newItemFormContainer");
       const btn = document.getElementById("showFormBtn");
       if (form.style.display === "none" || form.style.display === "") {
+        incarcaDateSalvate();
         form.style.display = "block";
         btn.style.display = "none";
       } else {
@@ -291,7 +315,6 @@
 
       document.getElementById("newItemName").value = '';
       document.getElementById("newItemQty").value = '';
-      document.getElementById("newElectricianPin").value = '';
       toggleNewItemForm(); 
     };
 
@@ -301,12 +324,8 @@
       currentItemStock = stock;
       document.getElementById("modalItemName").innerText = name;
       document.getElementById("transactionQty").value = '';
-      document.getElementById("electricianPin").value = '';
       
-      const savedName = localStorage.getItem('pram_user');
-      if (savedName) {
-        document.getElementById("electricianName").value = savedName;
-      }
+      incarcaDateSalvate();
 
       document.getElementById("transactionModal").style.display = "flex";
     };
