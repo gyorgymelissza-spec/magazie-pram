@@ -12,14 +12,13 @@
   <link rel="apple-touch-icon" href="icon-192.png">
 
   <style>
-    /* Design și aspect */
     body { font-family: Arial, sans-serif; background-color: #f4f4f9; margin: 0; padding: 0; }
     header { background-color: #0056b3; color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
     h1 { margin: 0; font-size: 1.5rem; }
     button { cursor: pointer; padding: 10px 15px; border: none; border-radius: 5px; font-weight: bold; font-size: 1rem; }
     .btn-history { background-color: #ffc107; color: #333; }
     .container { padding: 20px; max-width: 800px; margin: auto; }
-    input[type="text"], input[type="number"], select { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-size: 1rem; }
+    input[type="text"], input[type="number"], input[type="password"], select { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-size: 1rem; }
     .card { background: white; padding: 15px; margin-bottom: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
     .card h3 { margin: 0 0 5px 0; color: #333; }
     .btn-add { background-color: #28a745; color: white; }
@@ -30,6 +29,7 @@
     table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9rem; }
     th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
     th { background-color: #f2f2f2; }
+    .auth-box { background: #eef2f7; padding: 10px; border-radius: 5px; margin-bottom: 10px; border: 1px dashed #0056b3; }
   </style>
 </head>
 <body>
@@ -54,7 +54,30 @@
         <h3 style="margin: 0;">Adaugă material nou</h3>
         <button onclick="toggleNewItemForm()" style="background: none; border: none; color: #dc3545; font-size: 1rem; padding: 0; cursor: pointer;">✖ Închide</button>
       </div>
-      <input type="text" id="newItemName" placeholder="Nume material">
+
+      <div class="auth-box">
+        <label style="font-size: 0.9rem; font-weight: bold; color: #333;">Verificare electrician:</label>
+        <select id="newElectricianName">
+          <option value="">-- Cine adaugă materialul? --</option>
+          <option value="Bonati Cătălin Radu">Bonati Cătălin Radu</option>
+          <option value="Cristian Cosmin Andrei">Cristian Cosmin Andrei</option>
+          <option value="Dicsiuk Janos Ferencz">Dicsiuk Janos Ferencz[cite: 26]</option>
+          <option value="Fedorca Horea Cristian">Fedorca Horea Cristian[cite: 26]</option>
+          <option value="Fertea Cristian">Fertea Cristian</option>
+          <option value="Gyorgy Melissza">Gyorgy Melissza</option>
+          <option value="Ilyes Oscar">Ilyes Oscar</option>
+          <option value="Lakatos Laszlo">Lakatos Laszlo</option>
+          <option value="Pop Mircea">Pop Mircea</option>
+          <option value="Sabou Tudor">Sabou Tudor</option>
+          <option value="Surduc Lucian Viorel">Surduc Lucian Viorel[cite: 26]</option>
+          <option value="Traxler Arthur">Traxler Arthur</option>
+          <option value="Trif Gabriel Dan">Trif Gabriel Dan[cite: 26]</option>
+          <option value="Vlad Ioan Alexandru">Vlad Ioan Alexandru[cite: 26]</option>
+        </select>
+        <input type="password" id="newElectricianPin" placeholder="Introdu ultimele 5 cifre din marcă" maxlength="5">
+      </div>
+
+      <input type="text" id="newItemName" placeholder="Nume material nou">
       <input type="number" id="newItemQty" placeholder="Cantitate inițială">
       <button class="btn-add" onclick="addNewItem()" style="width: 100%;">Creează în baza de date</button>
     </div>
@@ -69,23 +92,27 @@
     <div class="modal-content">
       <h3 id="modalItemName" style="margin-top:0; color:#0056b3;">Nume Material</h3>
       
-      <select id="electricianName">
-        <option value="">-- Cine modifică stocul? --</option>
-        <option value="Bonaț Radu">Bonaț Radu</option>
-        <option value="Cristian Andrei">Cristian Andrei</option>
-        <option value="Dicsiuk János">Dicsiuk János</option>
-        <option value="Fedorca Horea">Fedorca Horea</option>
-        <option value="Fertea Cristian">Fertea Cristian</option>
-        <option value="György Melissza">György Melissza</option>
-        <option value="Ilyés Oscar">Ilyés Oscar</option>
-        <option value="Lakatos László">Lakatos László</option>
-        <option value="Pop Mircea">Pop Mircea</option>
-        <option value="Sabou Tudor">Sabou Tudor</option>
-        <option value="Surduc Lucian">Surduc Lucian</option>
-        <option value="Traxler Arthur">Traxler Arthur</option>
-        <option value="Trif Gabriel">Trif Gabriel</option>
-        <option value="Vlad Alexandru">Vlad Alexandru</option>
-      </select>
+      <div class="auth-box">
+        <label style="font-size: 0.9rem; font-weight: bold; color: #333;">Verificare electrician:</label>
+        <select id="electricianName">
+          <option value="">-- Cine modifică stocul? --</option>
+          <option value="Bonati Cătălin Radu">Bonati Cătălin Radu</option>
+          <option value="Cristian Cosmin Andrei">Cristian Cosmin Andrei</option>
+          <option value="Dicsiuk Janos Ferencz">Dicsiuk Janos Ferencz[cite: 26]</option>
+          <option value="Fedorca Horea Cristian">Fedorca Horea Cristian[cite: 26]</option>
+          <option value="Fertea Cristian">Fertea Cristian</option>
+          <option value="Gyorgy Melissza">Gyorgy Melissza</option>
+          <option value="Ilyes Oscar">Ilyes Oscar</option>
+          <option value="Lakatos Laszlo">Lakatos Laszlo</option>
+          <option value="Pop Mircea">Pop Mircea</option>
+          <option value="Sabou Tudor">Sabou Tudor</option>
+          <option value="Surduc Lucian Viorel">Surduc Lucian Viorel[cite: 26]</option>
+          <option value="Traxler Arthur">Traxler Arthur</option>
+          <option value="Trif Gabriel Dan">Trif Gabriel Dan[cite: 26]</option>
+          <option value="Vlad Ioan Alexandru">Vlad Ioan Alexandru[cite: 26]</option>
+        </select>
+        <input type="password" id="electricianPin" placeholder="Introdu ultimele 5 cifre din marcă" maxlength="5">
+      </div>
       
       <input type="number" id="transactionQty" placeholder="Introdu cantitatea">
       
@@ -139,6 +166,58 @@
     let currentItemStock = 0;
     let currentItemNameText = '';
 
+    // Baza de date completă cu mărcile din listă[cite: 26]
+    const marciValide = {
+      "Dicsiuk Janos Ferencz": "60008571",[cite: 26]
+      "Traxler Arthur": "60008142",[cite: 26]
+      "Surduc Lucian Viorel": "60009138",[cite: 26]
+      "Fedorca Horea Cristian": "60008750",[cite: 26]
+      "Trif Gabriel Dan": "60010562",[cite: 26]
+      "Vlad Ioan Alexandru": "60009107",[cite: 26]
+      "Lakatos Laszlo": "60009139",[cite: 26]
+      "Bonati Cătălin Radu": "60009644",[cite: 26]
+      "Pop Mircea": "60008745",[cite: 26]
+      "Cristian Cosmin Andrei": "60010378",[cite: 26]
+      "Gyorgy Melissza": "60010567",[cite: 26]
+      "Sabou Tudor": "60009137",[cite: 26]
+      "Ilyes Oscar": "60008572",[cite: 26]
+      "Fertea Cristian": "60008569"[cite: 26]
+    };
+
+    // Verifică dacă există un electrician deja logat în memoria telefonului
+    window.addEventListener('DOMContentLoaded', () => {
+      const savedName = localStorage.getItem('pram_user');
+      if (savedName && marciValide[savedName]) {
+        ['electricianName', 'newElectricianName'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.value = savedName;
+        });
+      }
+    });
+
+    function verificaElectrician(nume, pin) {
+      if (!nume) {
+        alert("Te rog selectează numele!");
+        return false;
+      }
+      if (!pin) {
+        alert("Te rog introdu ultimele 5 cifre din marcă!");
+        return false;
+      }
+      
+      const marcaCompleta = marciValide[nume];
+      const ultimele5 = marcaCompleta ? marcaCompleta.slice(-5) : '';
+
+      if (pin.trim() !== ultimele5) {
+        alert("Ultimele 5 cifre din marcă sunt incorecte pentru numele selectat! Acces respins.");
+        return false;
+      }
+      
+      // Memorează utilizatorul pe dispozitiv dacă datele sunt corecte
+      localStorage.setItem('pram_user', nume);
+      return true;
+    }
+
     onSnapshot(collection(db, "stocuri"), (snapshot) => {
       const list = document.getElementById("inventoryList");
       list.innerHTML = '';
@@ -166,7 +245,7 @@
         const tx = doc.data();
         const dateStr = tx.data ? tx.data.toDate().toLocaleString('ro-RO', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'}) : 'Acum';
         const color = tx.tip === 'add' ? '#28a745' : '#dc3545';
-        const sign = tx.tip === 'add' ? '+' : '-';
+        const sign = tx.tip === 'add' ? '+' : (tx.tip === 'create' ? 'NOU' : '-');
         
         tbody.innerHTML += `
           <tr>
@@ -192,16 +271,28 @@
     };
 
     window.addNewItem = async function() {
-      const nume = document.getElementById("newItemName").value;
+      const nume = document.getElementById("newItemName").value.trim();
       const cantitate = parseInt(document.getElementById("newItemQty").value);
-      if (nume && cantitate >= 0) {
-        await addDoc(collection(db, "stocuri"), { nume: nume, cantitate: cantitate });
-        document.getElementById("newItemName").value = '';
-        document.getElementById("newItemQty").value = '';
-        toggleNewItemForm(); 
-      } else {
-        alert("Te rog introdu un nume și o cantitate validă.");
-      }
+      const electrician = document.getElementById("newElectricianName").value;
+      const pin = document.getElementById("newElectricianPin").value;
+
+      if (!verificaElectrician(electrician, pin)) return;
+      if (!nume || isNaN(cantitate) || cantitate < 0) { alert("Introdu un nume de material și o cantitate validă."); return; }
+
+      await addDoc(collection(db, "stocuri"), { nume: nume, cantitate: cantitate });
+
+      await addDoc(collection(db, "istoric"), {
+        material: nume,
+        electrician: electrician,
+        cantitate: cantitate,
+        tip: 'create',
+        data: serverTimestamp()
+      });
+
+      document.getElementById("newItemName").value = '';
+      document.getElementById("newItemQty").value = '';
+      document.getElementById("newElectricianPin").value = '';
+      toggleNewItemForm(); 
     };
 
     window.openTransactionModal = function(id, name, stock) {
@@ -210,15 +301,22 @@
       currentItemStock = stock;
       document.getElementById("modalItemName").innerText = name;
       document.getElementById("transactionQty").value = '';
-      document.getElementById("electricianName").value = '';
+      document.getElementById("electricianPin").value = '';
+      
+      const savedName = localStorage.getItem('pram_user');
+      if (savedName) {
+        document.getElementById("electricianName").value = savedName;
+      }
+
       document.getElementById("transactionModal").style.display = "flex";
     };
 
     window.submitTransaction = async function(tip) {
       const qty = parseInt(document.getElementById("transactionQty").value);
       const electrician = document.getElementById("electricianName").value;
+      const pin = document.getElementById("electricianPin").value;
 
-      if (!electrician) { alert("Selectează electricianul!"); return; }
+      if (!verificaElectrician(electrician, pin)) return;
       if (!qty || qty <= 0) { alert("Introdu o cantitate mai mare ca zero!"); return; }
 
       let newStock = currentItemStock;
