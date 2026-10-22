@@ -129,7 +129,10 @@
   <!-- Fereastra pentru Istoric -->
   <div id="historyModal" class="modal">
     <div class="modal-content" style="max-width: 600px; max-height: 80vh; overflow-y: auto;">
-      <h3 style="margin-top:0;">Istoric magazie</h3>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <h3 style="margin: 0;">Istoric magazie</h3>
+        <button onclick="closeModal('historyModal')" style="background: none; border: none; color: #dc3545; font-size: 1rem; padding: 0; cursor: pointer; font-weight: bold;">✖ Închide</button>
+      </div>
       <table>
         <thead>
           <tr>
@@ -318,7 +321,6 @@
           return;
         }
 
-        // Transformăm datele într-un array și le sortăm alfabetic după nume
         const materiale = [];
         snapshot.forEach((docSnap) => {
           materiale.push({ id: docSnap.id, ...docSnap.data() });
